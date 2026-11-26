@@ -718,7 +718,7 @@ textarea {
 /* ===== Home ===== */
 .hero {
     padding: 56px 0 64px;
-    background: linear-gradient(135deg, #0a347a 0%, var(--primary) 55%, #2a6fe0 100%);
+    background: linear-gradient(135deg, #8fa2bf 0%, var(--primary) 55%, #6490dd 100%);
     color: var(--white);
 }
 
