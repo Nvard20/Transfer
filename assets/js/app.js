@@ -4,10 +4,10 @@
      data-root=""  or "../" for pages inside admin/ and partner/
      data-title="i18n key"   data-nav="active menu item" */
 (function () {
-    var LANGS = ["hy", "en", "ru"];
+    var LANGS = ["en", "hy", "ru"];
     var lang = localStorage.getItem("lang");
     if (LANGS.indexOf(lang) < 0) {
-        lang = "hy";
+        lang = "en";
     }
     var readyQueue = [];
 
@@ -16,7 +16,7 @@
         var dict = window.I18N[lang] || {};
         var text = dict[key];
         if (text == null) {
-            text = (window.I18N.hy || {})[key];
+            text = (window.I18N.en || {})[key];
         }
         if (text == null) {
             return key;
