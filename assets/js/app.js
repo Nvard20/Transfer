@@ -186,11 +186,12 @@
         var link = function (href, key, name) {
             return '<a class="' + (active === name ? "active" : "") + '" href="' + root + href + '" data-i18n="' + key + '"></a>';
         };
+        var home = root || "./";
         var header = document.createElement("header");
         header.className = "site-header";
         header.innerHTML =
             '<div class="container header-inner">' +
-            '<a class="brand" href="' + root + 'index.html">' + logo() + '<span data-i18n="brandName"></span></a>' +
+            '<a class="brand" href="' + home + '">' + logo() + '<span data-i18n="brandName"></span></a>' +
             '<button type="button" class="nav-toggle" data-nav-toggle data-i18n-aria="menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
             '<nav class="main-nav" data-nav>' +
             link("booking.html", "navBook", "book") +
@@ -207,7 +208,7 @@
         footer.className = "site-footer";
         footer.innerHTML =
             '<div class="container footer-grid">' +
-            '<div><a class="brand brand-light" href="' + root + 'index.html">' + logo() + '<span data-i18n="brandName"></span></a>' +
+            '<div><a class="brand brand-light" href="' + home + '">' + logo() + '<span data-i18n="brandName"></span></a>' +
             '<p class="footer-text" data-i18n="footerText"></p></div>' +
             '<div><h4 data-i18n="footerServices"></h4>' +
             '<a href="' + root + 'booking.html" data-i18n="navBook"></a>' +
@@ -216,8 +217,8 @@
             '<div><h4 data-i18n="footerCompany"></h4>' +
             '<a href="' + root + 'about.html" data-i18n="navAbout"></a>' +
             '<a href="' + root + 'faq.html" data-i18n="navFaq"></a>' +
-            '<a href="' + root + 'partner/index.html" data-i18n="forHotels"></a>' +
-            '<a href="' + root + 'admin/index.html" data-i18n="adminPanel"></a></div>' +
+            '<a href="' + root + 'partner/" data-i18n="forHotels"></a>' +
+            '<a href="' + root + 'admin/" data-i18n="adminPanel"></a></div>' +
             '<div><h4 data-i18n="navContact"></h4>' +
             '<a href="tel:' + t("contactPhoneValue").replace(/\s/g, "") + '" data-i18n="contactPhoneValue"></a>' +
             '<a href="mailto:' + t("contactEmailValue") + '" data-i18n="contactEmailValue"></a>' +
@@ -248,10 +249,10 @@
         panel.className = "panel";
         panel.innerHTML =
             '<aside class="panel-sidebar" data-sidebar>' +
-            '<a class="brand brand-light" href="' + root + 'index.html">' + logo() + '<span data-i18n="brandName"></span></a>' +
+            '<a class="brand brand-light" href="' + (root || "./") + '">' + logo() + '<span data-i18n="brandName"></span></a>' +
             '<span class="panel-role" data-i18n="' + (isAdmin ? "adminPanel" : "partnerPanel") + '"></span>' +
             '<nav class="panel-nav">' + nav + "</nav>" +
-            '<a class="panel-back" href="' + root + 'index.html">← <span data-i18n="backToSite"></span></a>' +
+            '<a class="panel-back" href="' + (root || "./") + '">← <span data-i18n="backToSite"></span></a>' +
             "</aside>" +
             '<div class="panel-overlay" data-sidebar-close></div>' +
             '<div class="panel-main">' +
