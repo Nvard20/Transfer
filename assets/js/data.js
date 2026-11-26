@@ -21,6 +21,16 @@
         { id: 3, nameKey: "vehicle_Bus", descKey: "vehicle_BusDesc", icon: "bus", passengers: 18, luggage: 18, factor: 3, active: true }
     ];
 
+    // Tours from the hotel: round trip, driver waits on site. Base price (AMD) × vehicle factor
+    var tours = [
+        { id: 1, nameKey: "tour_GarniGeghard", base: 25000 },
+        { id: 2, nameKey: "tour_KhorVirap", base: 22000 },
+        { id: 3, nameKey: "tour_Echmiadzin", base: 15000 },
+        { id: 4, nameKey: "tour_Sevan", base: 28000 },
+        { id: 5, nameKey: "tour_Dilijan", base: 40000 },
+        { id: 6, nameKey: "tour_Tatev", base: 70000 }
+    ];
+
     function hotel(id, name, zoneId, address, stars, partner) {
         return {
             id: id,
@@ -76,6 +86,12 @@
         return t ? t.price : 0;
     }
 
+    function tourPrice(tourId, vehicleId) {
+        var tour = byId(tours, tourId);
+        var v = byId(vehicles, vehicleId);
+        return tour && v ? Math.round(tour.base * v.factor / 500) * 500 : 0;
+    }
+
     // Builds a booking object from form fields (as in the query string)
     function buildBooking(p, source, code) {
         var airport = byId(airports, p.AirportId) || airports[0];
@@ -84,21 +100,24 @@
         var vehicle = byId(vehicles, p.VehicleTypeId) || vehicles[0];
         var date = p.Date || new Date(Date.now() + 86400000).toISOString().slice(0, 10);
         var time = p.Time || "12:00";
+        var direction = p.Direction === "Departure" || p.Direction === "Tour" ? p.Direction : "Arrival";
+        var tour = direction === "Tour" ? (byId(tours, p.TourId) || tours[0]) : null;
 
         return {
             code: code || "TRF-" + (2000 + Math.floor(Math.random() * 8000)),
-            direction: p.Direction === "Departure" ? "Departure" : "Arrival",
+            direction: direction,
+            tourId: tour ? tour.id : null,
             airportId: airport.id,
             hotelId: h ? h.id : null,
             hotelName: h ? h.name : "",
             address: h ? h.address : (p.Address || ""),
             zoneId: zone.id,
             pickupTime: new Date(date + "T" + time),
-            flightNumber: p.FlightNumber || "",
+            flightNumber: tour ? "" : (p.FlightNumber || ""),
             passengers: Number(p.Passengers) || 1,
-            luggage: Number(p.Luggage) || 0,
+            luggage: tour ? 0 : (Number(p.Luggage) || 0),
             vehicleId: vehicle.id,
-            price: getPrice(airport.id, zone.id, vehicle.id),
+            price: tour ? tourPrice(tour.id, vehicle.id) : getPrice(airport.id, zone.id, vehicle.id),
             customerName: p.CustomerName || "",
             email: p.Email || "",
             phone: p.Phone || "",
@@ -140,7 +159,8 @@
             var status = dayOffset < 0 ? (i % 7 === 0 ? "Cancelled" : "Completed") : pick(statuses);
 
             var b = buildBooking({
-                Direction: i % 3 === 0 ? "Departure" : "Arrival",
+                Direction: i % 5 === 2 ? "Tour" : (i % 3 === 0 ? "Departure" : "Arrival"),
+                TourId: 1 + (i % tours.length),
                 AirportId: h.zoneId === 6 && rnd() < 0.5 ? 2 : 1,
                 HotelId: h.id,
                 Date: d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"),
@@ -167,6 +187,7 @@
         zones: zones,
         vehicles: vehicles,
         hotels: hotels,
+        tours: tours,
         tariffs: tariffs,
         bookings: bookings,
         statuses: ["New", "Confirmed", "InProgress", "Completed", "Cancelled"],
@@ -175,7 +196,9 @@
         zone: function (id) { return byId(zones, id); },
         vehicle: function (id) { return byId(vehicles, id); },
         hotel: function (id) { return byId(hotels, id); },
+        tour: function (id) { return byId(tours, id); },
         getPrice: getPrice,
+        tourPrice: tourPrice,
         buildBooking: buildBooking,
         findBooking: function (code, email) {
             if (!code) {

@@ -21,13 +21,38 @@
         return Math.min.apply(null, Data.tariffs.filter(filter).map(function (x) { return x.price; }));
     }
 
+    // Tabs: one per airport + "Tours". current = airport id or "tours"
     function airportTabs(target, current, page) {
         el(target).innerHTML = Data.airports.map(function (a) {
             return '<a class="tab' + (a.id === current ? " active" : "") + '" href="' + page + "?airport=" + a.id + '">' + esc(airportName(a)) + "</a>";
+        }).join("") +
+            '<a class="tab' + (current === "tours" ? " active" : "") + '" href="' + page + '?airport=tours" data-i18n="tours"></a>';
+    }
+
+    function tabFromQuery() {
+        var key = App.params().airport;
+        return key === "tours" ? "tours" : Number(key) || 1;
+    }
+
+    function tourTable(editable) {
+        var head = '<th data-i18n="tour"></th>' + Data.vehicles.map(function (v) {
+            return '<th class="num">' + esc(t(v.nameKey)) + (editable ? "" : ' <small class="muted">' + esc(t("upToPassengers", v.passengers)) + "</small>") + "</th>";
         }).join("");
+        var rows = Data.tours.map(function (tour) {
+            return "<tr><td><strong>" + esc(t(tour.nameKey)) + "</strong></td>" + Data.vehicles.map(function (v) {
+                var text = App.price(Data.tourPrice(tour.id, v.id));
+                return '<td class="num">' + (editable
+                    ? '<a class="cell-link" href="tariff.html?tour=' + tour.id + "&vehicle=" + v.id + '">' + esc(text) + "</a>"
+                    : esc(text)) + "</td>";
+            }).join("") + "</tr>";
+        }).join("");
+        return '<table class="table"><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table>";
     }
 
     function tariffTable(airportId, editable) {
+        if (airportId === "tours") {
+            return tourTable(editable);
+        }
         var head = '<th data-i18n="zone"></th>' + Data.vehicles.map(function (v) {
             return '<th class="num">' + esc(t(v.nameKey)) + (editable ? "" : ' <small class="muted">' + esc(t("upToPassengers", v.passengers)) + "</small>") + "</th>";
         }).join("");
@@ -50,11 +75,14 @@
         }
         var rows = list.map(function (b) {
             var a = Data.airport(b.airportId);
+            var route = b.direction === "Tour"
+                ? App.place(b) + " → " + t(Data.tour(b.tourId).nameKey)
+                : b.direction === "Arrival" ? a.code + " → " + App.place(b) : App.place(b) + " → " + a.code;
             return '<tr data-href="booking.html?id=' + b.code + '">' +
                 '<td><a class="strong-link" href="booking.html?id=' + b.code + '">' + esc(b.code) + "</a></td>" +
                 '<td class="nowrap">' + App.fmtDateTime(b.pickupTime) + "</td>" +
                 "<td>" + App.dirLabel(b.direction) + "</td>" +
-                '<td><span class="route-inline">' + esc(a.code) + " → " + esc(App.place(b)) + "</span>" +
+                '<td><span class="route-inline">' + esc(route) + "</span>" +
                 (b.flightNumber ? '<small class="muted">' + esc(b.flightNumber) + "</small>" : "") + "</td>" +
                 '<td class="num">' + b.passengers + "</td>" +
                 "<td>" + esc(t(Data.vehicle(b.vehicleId).nameKey)) + "</td>" +
@@ -98,6 +126,24 @@
                     "</div>";
             }).join("");
 
+            el("tours").innerHTML = Data.tours.map(function (tour) {
+                return '<a class="zone-card" href="booking.html?Direction=Tour&TourId=' + tour.id + '">' +
+                    '<span class="zone-name" data-i18n="' + tour.nameKey + '"></span>' +
+                    '<span class="zone-price">' + esc(t("pricesFrom", App.price(Data.tourPrice(tour.id, 1)))) + "</span></a>";
+            }).join("");
+
+            // Quick form: tour needs a tour select instead of the airport
+            el("qTour").innerHTML = selectOptions(Data.tours, 1, function (x) { return t(x.nameKey); });
+            document.querySelectorAll('.quick-form input[name="Direction"]').forEach(function (r) {
+                r.addEventListener("change", function () {
+                    var tour = r.value === "Tour";
+                    el("qAirportField").hidden = tour;
+                    el("qAirport").disabled = tour;
+                    el("qTourField").hidden = !tour;
+                    el("qTour").disabled = !tour;
+                });
+            });
+
             el("zones").innerHTML = Data.zones.map(function (z) {
                 return '<a class="zone-card" href="booking.html?HotelId=0&ZoneId=' + z.id + '">' +
                     '<span class="zone-name" data-i18n="' + z.nameKey + '"></span>' +
@@ -106,10 +152,11 @@
         },
 
         prices: function () {
-            var airportId = Number(App.params().airport) || 1;
-            airportTabs("airportTabs", airportId, "prices.html");
-            el("pricesTable").innerHTML = tariffTable(airportId, false);
-            el("bookLink").href = "booking.html?AirportId=" + airportId;
+            var tab = tabFromQuery();
+            airportTabs("airportTabs", tab, "prices.html");
+            el("pricesTable").innerHTML = tariffTable(tab, false);
+            el("tourNote").hidden = tab !== "tours";
+            el("bookLink").href = tab === "tours" ? "booking.html?Direction=Tour" : "booking.html?AirportId=" + tab;
         },
 
         confirmation: function () {
@@ -230,25 +277,35 @@
         },
 
         tariffs: function () {
-            var airportId = Number(App.params().airport) || 1;
-            airportTabs("airportTabs", airportId, "tariffs.html");
-            el("tariffTable").innerHTML = tariffTable(airportId, true);
-            el("addTariff").href = "tariff.html?airport=" + airportId;
+            var tab = tabFromQuery();
+            airportTabs("airportTabs", tab, "tariffs.html");
+            el("tariffTable").innerHTML = tariffTable(tab, true);
+            el("addTariff").href = tab === "tours" ? "tariff.html?tour=new" : "tariff.html?airport=" + tab;
         },
 
+        // Price of an airport transfer (airport + zone + car) or of a tour (tour + car)
         tariff: function () {
             var p = App.params();
+            var isTour = !!p.tour;
             var airportId = Number(p.airport) || 1;
-            var exists = p.zone && p.vehicle && Data.getPrice(airportId, p.zone, p.vehicle) > 0;
-            App.setTitle(t(exists ? "editTariff" : "addTariff"));
-            el("formTitle").textContent = t(exists ? "editTariff" : "addTariff");
+            var price = isTour
+                ? Data.tourPrice(p.tour, p.vehicle)
+                : (p.zone && p.vehicle ? Data.getPrice(airportId, p.zone, p.vehicle) : 0);
+            var back = isTour ? "tariffs.html?airport=tours" : "tariffs.html?airport=" + airportId;
+
+            App.setTitle(t(price ? "editTariff" : "addTariff"));
+            el("formTitle").textContent = t(price ? "editTariff" : "addTariff");
+            el("airportField").hidden = isTour;
+            el("zoneField").hidden = isTour;
+            el("tourField").hidden = !isTour;
             el("airport").innerHTML = selectOptions(Data.airports, airportId, airportName);
             el("zone").innerHTML = selectOptions(Data.zones, p.zone || 1, function (z) { return t(z.nameKey); });
+            el("tourSelect").innerHTML = selectOptions(Data.tours, p.tour, function (x) { return t(x.nameKey); });
             el("vehicle").innerHTML = selectOptions(Data.vehicles, p.vehicle || 1, function (v) { return t(v.nameKey); });
-            el("price").value = exists ? Data.getPrice(airportId, p.zone, p.vehicle) : "";
+            el("price").value = price || "";
             el("priceLabel").textContent = t("price") + " (" + t("currencyAmd") + ")";
-            el("backLink").href = "tariffs.html?airport=" + airportId;
-            el("cancelLink").href = "tariffs.html?airport=" + airportId;
+            el("backLink").href = back;
+            el("cancelLink").href = back;
         },
 
         vehicles: function () {

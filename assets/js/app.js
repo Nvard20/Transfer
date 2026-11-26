@@ -142,10 +142,11 @@
     // Booking card used on confirmation, my booking, admin and partner pages
     function renderDetails(b) {
         var arrival = b.direction === "Arrival";
+        var tour = b.direction === "Tour";
         var from = arrival ? airportText(b) : place(b);
         var fromSub = arrival ? b.flightNumber : b.address;
-        var to = arrival ? place(b) : airportText(b);
-        var toSub = arrival ? b.address : b.flightNumber;
+        var to = tour ? t(Data.tour(b.tourId).nameKey) : (arrival ? place(b) : airportText(b));
+        var toSub = tour ? t("tourHint") : (arrival ? b.address : b.flightNumber);
         var row = function (label, value, wide) {
             return '<div class="' + (wide ? "span-2" : "") + '"><dt>' + esc(t(label)) + "</dt><dd>" + esc(value) + "</dd></div>";
         };
@@ -160,10 +161,10 @@
             '<dl class="details-grid">' +
             row("direction", t("direction_" + b.direction)) +
             row(arrival ? "arrivalTime" : "pickupTimeLabel", fmtDateTime(b.pickupTime)) +
-            row("flightNumber", b.flightNumber || "—") +
+            (tour ? row("tour", t(Data.tour(b.tourId).nameKey)) : row("flightNumber", b.flightNumber || "—")) +
             row("zone", t(Data.zone(b.zoneId).nameKey)) +
             row("passengers", b.passengers) +
-            row("luggage", b.luggage) +
+            (tour ? "" : row("luggage", b.luggage)) +
             row("vehicle", t(Data.vehicle(b.vehicleId).nameKey)) +
             row("paymentMethod", t("payment_" + b.payment)) +
             row("fullName", b.customerName) +

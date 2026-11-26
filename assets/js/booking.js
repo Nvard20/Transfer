@@ -25,7 +25,11 @@
     }
 
     function markup(p, fixedHotel) {
-        var arrival = p.Direction !== "Departure";
+        var mode = p.Direction === "Departure" || p.Direction === "Tour" ? p.Direction : "Arrival";
+        var radio = function (value) {
+            return '<label><input type="radio" name="Direction" value="' + value + '"' + (mode === value ? " checked" : "") +
+                '><span data-i18n="direction_' + value + '"></span></label>';
+        };
         var today = App.ymd(new Date());
         var tomorrow = App.ymd(new Date(Date.now() + 86400000));
         var isOther = !fixedHotel && p.HotelId === "0";
@@ -64,25 +68,25 @@
 
             // Step 1
             '<section class="card step-panel" data-step="1">' +
-            '<h2 class="step-title" data-i18n="stepRouteTitle"></h2>' +
-            '<div class="segmented">' +
-            '<label><input type="radio" name="Direction" value="Arrival"' + (arrival ? " checked" : "") + '><span data-i18n="direction_Arrival"></span></label>' +
-            '<label><input type="radio" name="Direction" value="Departure"' + (!arrival ? " checked" : "") + '><span data-i18n="direction_Departure"></span></label>' +
-            "</div>" +
+            '<h2 class="step-title" data-dir-label="stepRouteTitle|stepRouteTitle|tourRouteTitle"></h2>' +
+            '<div class="segmented">' + radio("Arrival") + radio("Departure") + radio("Tour") + "</div>" +
             '<div class="form-grid">' +
-            '<div class="field"><label for="AirportId" data-i18n="airport"></label>' +
+            '<div class="field" data-mode-only="airport"><label for="AirportId" data-i18n="airport"></label>' +
             '<select id="AirportId" name="AirportId" required>' + options(Data.airports, p.AirportId || 1, function (a) { return t(a.nameKey) + " (" + a.code + ")"; }) + "</select></div>" +
             hotelField +
-            '<div class="field"><label for="Date" data-dir-label="arrivalDate|pickupDate"></label>' +
+            '<div class="field" data-mode-only="tour"><label for="TourId" data-i18n="tour"></label>' +
+            '<select id="TourId" name="TourId" required>' + options(Data.tours, p.TourId || 1, function (x) { return t(x.nameKey); }) + "</select>" +
+            '<small class="hint" data-i18n="tourHint"></small></div>' +
+            '<div class="field"><label for="Date" data-dir-label="arrivalDate|pickupDate|tourDate"></label>' +
             '<input type="date" id="Date" name="Date" value="' + esc(p.Date || tomorrow) + '" min="' + today + '" required></div>' +
-            '<div class="field"><label for="Time" data-dir-label="arrivalTime|pickupTimeLabel"></label>' +
+            '<div class="field"><label for="Time" data-dir-label="arrivalTime|pickupTimeLabel|pickupTimeLabel"></label>' +
             '<input type="time" id="Time" name="Time" value="' + esc(p.Time || "") + '" required></div>' +
-            '<div class="field"><label for="FlightNumber" data-i18n="flightNumber"></label>' +
+            '<div class="field" data-mode-only="airport"><label for="FlightNumber" data-i18n="flightNumber"></label>' +
             '<input type="text" id="FlightNumber" name="FlightNumber" value="' + esc(p.FlightNumber || "") + '" data-i18n-placeholder="flightNumberPlaceholder">' +
             '<small class="hint" data-dir-label="flightHintArrival|flightHintDeparture"></small></div>' +
             '<div class="field field-pair">' +
             '<div><label for="Passengers" data-i18n="passengers"></label><input type="number" id="Passengers" name="Passengers" value="' + pax + '" min="1" max="18" required></div>' +
-            '<div><label for="Luggage" data-i18n="luggage"></label><input type="number" id="Luggage" name="Luggage" value="' + esc(p.Luggage || pax) + '" min="0" max="18" required></div>' +
+            '<div data-mode-only="airport"><label for="Luggage" data-i18n="luggage"></label><input type="number" id="Luggage" name="Luggage" value="' + esc(p.Luggage || pax) + '" min="0" max="18" required></div>' +
             "</div>" +
             "</div>" +
             '<div class="step-actions"><button type="button" class="btn btn-primary" data-next data-i18n="next"></button></div>' +
@@ -181,13 +185,30 @@
             return "—";
         }
 
-        // Labels that depend on direction: data-dir-label="arrivalKey|departureKey"
+        // Labels that depend on direction: data-dir-label="arrivalKey|departureKey|tourKey"
+        // Fields only for airport trips or only for tours: data-mode-only="airport" | "tour"
         function updateDirection() {
-            var arrival = direction() === "Arrival";
+            var mode = direction();
+            var index = { Arrival: 0, Departure: 1, Tour: 2 }[mode];
             $$("[data-dir-label]").forEach(function (el) {
                 var keys = el.getAttribute("data-dir-label").split("|");
-                el.textContent = t(arrival ? keys[0] : keys[1]);
+                el.textContent = t(keys[index] || keys[1]);
             });
+            $$("[data-mode-only]").forEach(function (el) {
+                var show = el.getAttribute("data-mode-only") === (mode === "Tour" ? "tour" : "airport");
+                el.hidden = !show;
+                el.querySelectorAll("input, select").forEach(function (f) {
+                    f.disabled = !show;
+                });
+            });
+        }
+
+        function isTour() {
+            return direction() === "Tour";
+        }
+
+        function tourName() {
+            return t(Data.tour(val("TourId")).nameKey);
         }
 
         function updateAddress() {
@@ -204,7 +225,7 @@
 
         function updateVehicles() {
             var pax = Number(val("Passengers")) || 1;
-            var bags = Number(val("Luggage")) || 0;
+            var bags = isTour() ? 0 : Number(val("Luggage")) || 0;
             var z = zoneId();
             var airportId = val("AirportId");
 
@@ -216,7 +237,7 @@
                 if (tooSmall && radio.checked) {
                     radio.checked = false;
                 }
-                var p = z ? Data.getPrice(airportId, z, radio.value) : 0;
+                var p = isTour() ? Data.tourPrice(val("TourId"), radio.value) : (z ? Data.getPrice(airportId, z, radio.value) : 0);
                 card.querySelector("[data-price]").textContent = p ? App.price(p) : "—";
             });
 
@@ -239,13 +260,16 @@
                 $('[data-sum="' + key + '"]').textContent = text;
             };
 
+            var tour = isTour();
+            var price = !vehicle ? 0 : tour ? Data.tourPrice(val("TourId"), vehicle.value) : (z ? Data.getPrice(airport.id, z, vehicle.value) : 0);
+
             set("direction", t("direction_" + direction()));
             set("from", arrival ? airportName : placeText());
-            set("to", arrival ? placeText() : airportName);
+            set("to", tour ? tourName() : (arrival ? placeText() : airportName));
             set("datetime", val("Date") ? val("Date").split("-").reverse().join(".") + (val("Time") ? " " + val("Time") : "") : "—");
-            set("passengers", val("Passengers") + " / " + t("luggage").toLowerCase() + ": " + val("Luggage"));
+            set("passengers", tour ? val("Passengers") : val("Passengers") + " / " + t("luggage").toLowerCase() + ": " + val("Luggage"));
             set("vehicle", vehicle ? t(Data.vehicle(vehicle.value).nameKey) : "—");
-            set("price", vehicle && z ? App.price(Data.getPrice(airport.id, z, vehicle.value)) : "—");
+            set("price", price ? App.price(price) : "—");
         }
 
         function refresh() {

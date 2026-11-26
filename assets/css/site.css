@@ -400,6 +400,11 @@ textarea {
     color: var(--primary);
 }
 
+.dir-tour::before {
+    content: "⟳ ";
+    color: var(--accent-dark);
+}
+
 .table-wrap {
     overflow-x: auto;
 }
@@ -666,6 +671,10 @@ textarea {
     align-items: baseline;
     justify-content: space-between;
     gap: 16px;
+}
+
+.section-lead {
+    margin: -12px 0 24px;
 }
 
 .link-arrow {
@@ -1301,6 +1310,10 @@ textarea {
 }
 
 /* ===== Static pages ===== */
+.tour-note {
+    margin: 12px 0 0;
+}
+
 .note-list {
     margin: 20px 0 24px;
     padding-left: 20px;

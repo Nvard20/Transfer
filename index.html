@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Arev Transfer</title>
-    <link rel="stylesheet" href="assets/css/site.css">
+    <link rel="stylesheet" href="assets/css/site.css?v=2">
 </head>
 <body data-layout="public" data-page="home" data-title="homeTitle">
     <main>
@@ -33,14 +33,22 @@
                             <input type="radio" name="Direction" value="Departure">
                             <span data-i18n="direction_Departure"></span>
                         </label>
+                        <label>
+                            <input type="radio" name="Direction" value="Tour">
+                            <span data-i18n="direction_Tour"></span>
+                        </label>
                     </div>
-                    <div class="field">
+                    <div class="field" id="qAirportField">
                         <label for="qAirport" data-i18n="airport"></label>
                         <select id="qAirport" name="AirportId"></select>
                     </div>
                     <div class="field">
                         <label for="qHotel" data-i18n="hotel"></label>
                         <select id="qHotel" name="HotelId"></select>
+                    </div>
+                    <div class="field" id="qTourField" hidden>
+                        <label for="qTour" data-i18n="tour"></label>
+                        <select id="qTour" name="TourId" disabled></select>
                     </div>
                     <div class="field-pair">
                         <div class="field">
@@ -101,6 +109,18 @@
             </div>
         </section>
 
+        <!-- Tours from the hotel -->
+        <section class="section section-alt">
+            <div class="container">
+                <div class="section-head">
+                    <h2 class="section-title" data-i18n="toursTitle"></h2>
+                    <a class="link-arrow" href="prices.html?airport=tours"><span data-i18n="allPrices"></span> →</a>
+                </div>
+                <p class="muted section-lead" data-i18n="toursLead"></p>
+                <div class="zone-grid" id="tours"></div>
+            </div>
+        </section>
+
         <!-- Partner CTA -->
         <section class="section">
             <div class="container">
@@ -115,9 +135,9 @@
         </section>
     </main>
 
-    <script src="assets/js/i18n.js"></script>
-    <script src="assets/js/data.js"></script>
-    <script src="assets/js/app.js"></script>
-    <script src="assets/js/pages.js"></script>
+    <script src="assets/js/i18n.js?v=2"></script>
+    <script src="assets/js/data.js?v=2"></script>
+    <script src="assets/js/app.js?v=2"></script>
+    <script src="assets/js/pages.js?v=2"></script>
 </body>
 </html>
