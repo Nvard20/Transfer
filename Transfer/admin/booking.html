@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arev Transfer</title>
+    <link rel="stylesheet" href="../assets/css/site.css">
+    <link rel="stylesheet" href="../assets/css/panel.css">
+</head>
+<body data-layout="admin" data-root="../" data-page="adminBooking" data-title="booking" data-nav="bookings">
+    <main>
+        <a class="link-back" href="bookings.html">← <span data-i18n="bookings"></span></a>
+
+        <div class="details-layout">
+            <div id="details"></div>
+
+            <aside class="details-side" id="side">
+                <form class="card side-card" data-demo-form data-demo-message="demoSaved">
+                    <h3 data-i18n="manageBooking"></h3>
+                    <div class="field">
+                        <label for="status" data-i18n="status"></label>
+                        <select id="status"></select>
+                    </div>
+                    <div class="field">
+                        <label for="plate" data-i18n="carPlate"></label>
+                        <input type="text" id="plate" data-i18n-placeholder="carPlatePlaceholder">
+                    </div>
+                    <div class="field">
+                        <label for="note" data-i18n="internalNote"></label>
+                        <textarea id="note" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" data-i18n="save"></button>
+                </form>
+
+                <div class="card side-card">
+                    <h3 data-i18n="customer"></h3>
+                    <strong id="customerName"></strong>
+                    <a id="customerPhone" href="#"></a>
+                    <a id="customerEmail" href="#"></a>
+                    <button type="button" class="btn btn-ghost btn-block" data-demo-action data-demo-message="demoEmailSent" data-i18n="resendConfirmation"></button>
+                </div>
+
+                <div class="card side-card">
+                    <dl class="meta-list">
+                        <div><dt data-i18n="source"></dt><dd id="metaSource"></dd></div>
+                        <div><dt data-i18n="createdAt"></dt><dd id="metaCreated"></dd></div>
+                    </dl>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script src="../assets/js/i18n.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script src="../assets/js/pages.js"></script>
+</body>
+</html>

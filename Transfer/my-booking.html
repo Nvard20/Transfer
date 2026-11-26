@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arev Transfer</title>
+    <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-layout="public" data-page="myBooking" data-title="myBookingTitle" data-nav="my">
+    <main>
+        <section class="page-head page-head-sm">
+            <div class="container">
+                <h1 data-i18n="myBookingTitle"></h1>
+                <p class="lead" data-i18n="myBookingLead"></p>
+            </div>
+        </section>
+
+        <section class="section section-tight">
+            <div class="container narrow-sm">
+                <form class="card form-card" method="get" action="booking-details.html">
+                    <div class="alert alert-error" id="alert" data-i18n="bookingNotFound" hidden></div>
+                    <div class="field">
+                        <label for="code" data-i18n="bookingCode"></label>
+                        <input type="text" id="code" name="code" data-i18n-placeholder="codePlaceholder" required>
+                    </div>
+                    <div class="field">
+                        <label for="email" data-i18n="email"></label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" data-i18n="findBooking"></button>
+                    <p class="muted small center" data-i18n="demoLookupHint"></p>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/pages.js"></script>
+</body>
+</html>

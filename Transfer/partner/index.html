@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arev Transfer</title>
+    <link rel="stylesheet" href="../assets/css/site.css">
+    <link rel="stylesheet" href="../assets/css/panel.css">
+</head>
+<body data-layout="partner" data-root="../" data-page="partnerList" data-title="myBookings" data-nav="list">
+    <main>
+        <div class="card partner-head">
+            <div>
+                <span class="muted small" data-i18n="hotel"></span>
+                <h2 id="hotelName"></h2>
+                <span class="muted" id="hotelAddress"></span>
+            </div>
+            <div class="partner-head-stats">
+                <div><strong id="totalCount"></strong><span data-i18n="totalBookings"></span></div>
+                <div><strong id="upcomingCount"></strong><span data-i18n="upcoming"></span></div>
+            </div>
+            <a class="btn btn-accent" href="create.html">+ <span data-i18n="newBooking"></span></a>
+        </div>
+
+        <section class="card panel-card">
+            <div class="panel-card-head">
+                <h2 data-i18n="myBookings"></h2>
+            </div>
+            <div id="partnerTable"></div>
+        </section>
+    </main>
+
+    <script src="../assets/js/i18n.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script src="../assets/js/pages.js"></script>
+</body>
+</html>

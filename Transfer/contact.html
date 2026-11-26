@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arev Transfer</title>
+    <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-layout="public" data-page="contact" data-title="contactTitle" data-nav="contact">
+    <main>
+        <section class="page-head">
+            <div class="container">
+                <h1 data-i18n="contactTitle"></h1>
+                <p class="lead" data-i18n="contactLead"></p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container contact-grid">
+                <div class="contact-cards">
+                    <div class="card contact-card">
+                        <span class="muted small" data-i18n="phone"></span>
+                        <a href="tel:+37410000000" data-i18n="contactPhoneValue"></a>
+                        <span class="muted small" data-i18n="support247"></span>
+                    </div>
+                    <div class="card contact-card">
+                        <span class="muted small" data-i18n="email"></span>
+                        <a href="mailto:info@arev-transfer.example" data-i18n="contactEmailValue"></a>
+                    </div>
+                    <div class="card contact-card">
+                        <span class="muted small" data-i18n="address"></span>
+                        <strong data-i18n="contactAddressValue"></strong>
+                    </div>
+                </div>
+
+                <form class="card form-card" data-demo-form data-demo-message="demoMessageSent">
+                    <h2 data-i18n="writeUs"></h2>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="cName" data-i18n="fullName"></label>
+                            <input type="text" id="cName" required>
+                        </div>
+                        <div class="field">
+                            <label for="cEmail" data-i18n="email"></label>
+                            <input type="email" id="cEmail" required>
+                        </div>
+                        <div class="field span-2">
+                            <label for="cTopic" data-i18n="topic"></label>
+                            <select id="cTopic">
+                                <option data-i18n="topicBooking"></option>
+                                <option data-i18n="topicPartner"></option>
+                                <option data-i18n="topicOther"></option>
+                            </select>
+                        </div>
+                        <div class="field span-2">
+                            <label for="cMessage" data-i18n="message"></label>
+                            <textarea id="cMessage" rows="5" required></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" data-i18n="send"></button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

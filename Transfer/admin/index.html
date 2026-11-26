@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arev Transfer</title>
+    <link rel="stylesheet" href="../assets/css/site.css">
+    <link rel="stylesheet" href="../assets/css/panel.css">
+</head>
+<body data-layout="admin" data-root="../" data-page="dashboard" data-title="dashboard" data-nav="dashboard">
+    <main>
+        <div class="stat-cards">
+            <div class="card stat-card">
+                <span class="stat-label" data-i18n="statToday"></span>
+                <strong class="stat-value" id="statToday"></strong>
+                <span class="muted small" id="statTodayDate"></span>
+            </div>
+            <div class="card stat-card">
+                <span class="stat-label" data-i18n="statTomorrow"></span>
+                <strong class="stat-value" id="statTomorrow"></strong>
+                <span class="muted small" id="statTomorrowDate"></span>
+            </div>
+            <div class="card stat-card stat-card-warn">
+                <span class="stat-label" data-i18n="statNew"></span>
+                <strong class="stat-value" id="statNew"></strong>
+                <a class="small" href="bookings.html?status=New"><span data-i18n="review"></span> →</a>
+            </div>
+            <div class="card stat-card">
+                <span class="stat-label" data-i18n="statMonthRevenue"></span>
+                <strong class="stat-value" id="statRevenue"></strong>
+                <span class="muted small" id="statMonth"></span>
+            </div>
+        </div>
+
+        <section class="card panel-card">
+            <div class="panel-card-head">
+                <h2 data-i18n="todayTransfers"></h2>
+                <a class="btn btn-ghost btn-sm" id="todayAll" href="bookings.html" data-i18n="showAll"></a>
+            </div>
+            <div id="todayTable"></div>
+        </section>
+
+        <section class="card panel-card">
+            <div class="panel-card-head">
+                <h2 data-i18n="tomorrowTransfers"></h2>
+                <a class="btn btn-ghost btn-sm" id="tomorrowAll" href="bookings.html" data-i18n="showAll"></a>
+            </div>
+            <div id="tomorrowTable"></div>
+        </section>
+    </main>
+
+    <script src="../assets/js/i18n.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script src="../assets/js/pages.js"></script>
+</body>
+</html>

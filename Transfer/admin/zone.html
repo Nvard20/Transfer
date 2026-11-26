@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arev Transfer</title>
+    <link rel="stylesheet" href="../assets/css/site.css">
+    <link rel="stylesheet" href="../assets/css/panel.css">
+</head>
+<body data-layout="admin" data-root="../" data-page="zone" data-title="zones" data-nav="zones">
+    <main>
+        <a class="link-back" href="zones.html">← <span data-i18n="zones"></span></a>
+
+        <form class="card form-card form-narrow" data-demo-form data-demo-message="demoSaved">
+            <h2 id="formTitle"></h2>
+            <div class="form-grid">
+                <div class="field span-2">
+                    <label for="nameHy" data-i18n="nameHy"></label>
+                    <input type="text" id="nameHy" required>
+                </div>
+                <div class="field">
+                    <label for="nameEn" data-i18n="nameEn"></label>
+                    <input type="text" id="nameEn" required>
+                </div>
+                <div class="field">
+                    <label for="nameRu" data-i18n="nameRu"></label>
+                    <input type="text" id="nameRu" required>
+                </div>
+            </div>
+            <label class="checkbox">
+                <input type="checkbox" id="isActive" checked>
+                <span data-i18n="active"></span>
+            </label>
+            <div class="form-actions">
+                <a class="btn btn-ghost" href="zones.html" data-i18n="cancel"></a>
+                <button type="submit" class="btn btn-primary" data-i18n="save"></button>
+            </div>
+        </form>
+    </main>
+
+    <script src="../assets/js/i18n.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script src="../assets/js/pages.js"></script>
+</body>
+</html>

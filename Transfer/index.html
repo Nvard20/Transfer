@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arev Transfer</title>
+    <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-layout="public" data-page="home" data-title="homeTitle">
+    <main>
+        <!-- Hero + quick search -->
+        <section class="hero">
+            <div class="container hero-inner">
+                <div class="hero-text">
+                    <span class="eyebrow" data-i18n="heroEyebrow"></span>
+                    <h1 data-i18n="heroTitle"></h1>
+                    <p class="lead" data-i18n="heroLead"></p>
+                    <ul class="hero-points">
+                        <li data-i18n="heroPointFixed"></li>
+                        <li data-i18n="heroPointFlight"></li>
+                        <li data-i18n="heroPointMeet"></li>
+                    </ul>
+                </div>
+
+                <form class="card quick-form" method="get" action="booking.html">
+                    <h2 data-i18n="quickFormTitle"></h2>
+                    <div class="segmented">
+                        <label>
+                            <input type="radio" name="Direction" value="Arrival" checked>
+                            <span data-i18n="direction_Arrival"></span>
+                        </label>
+                        <label>
+                            <input type="radio" name="Direction" value="Departure">
+                            <span data-i18n="direction_Departure"></span>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label for="qAirport" data-i18n="airport"></label>
+                        <select id="qAirport" name="AirportId"></select>
+                    </div>
+                    <div class="field">
+                        <label for="qHotel" data-i18n="hotel"></label>
+                        <select id="qHotel" name="HotelId"></select>
+                    </div>
+                    <div class="field-pair">
+                        <div class="field">
+                            <label for="qDate" data-i18n="date"></label>
+                            <input type="date" id="qDate" name="Date">
+                        </div>
+                        <div class="field">
+                            <label for="qPassengers" data-i18n="passengers"></label>
+                            <input type="number" id="qPassengers" name="Passengers" value="2" min="1" max="18">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-accent btn-block" data-i18n="findCar"></button>
+                    <p class="muted small center" id="qFrom"></p>
+                </form>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title" data-i18n="howItWorks"></h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <span class="step-card-num">1</span>
+                        <h3 data-i18n="how1Title"></h3>
+                        <p data-i18n="how1Text"></p>
+                    </div>
+                    <div class="step-card">
+                        <span class="step-card-num">2</span>
+                        <h3 data-i18n="how2Title"></h3>
+                        <p data-i18n="how2Text"></p>
+                    </div>
+                    <div class="step-card">
+                        <span class="step-card-num">3</span>
+                        <h3 data-i18n="how3Title"></h3>
+                        <p data-i18n="how3Text"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fleet -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2 class="section-title" data-i18n="ourFleet"></h2>
+                <div class="fleet-grid" id="fleet"></div>
+            </div>
+        </section>
+
+        <!-- Destinations -->
+        <section class="section">
+            <div class="container">
+                <div class="section-head">
+                    <h2 class="section-title" data-i18n="popularDestinations"></h2>
+                    <a class="link-arrow" href="prices.html"><span data-i18n="allPrices"></span> →</a>
+                </div>
+                <div class="zone-grid" id="zones"></div>
+            </div>
+        </section>
+
+        <!-- Partner CTA -->
+        <section class="section">
+            <div class="container">
+                <div class="cta-band">
+                    <div>
+                        <h2 data-i18n="partnerCtaTitle"></h2>
+                        <p data-i18n="partnerCtaText"></p>
+                    </div>
+                    <a class="btn btn-light" href="contact.html" data-i18n="becomePartner"></a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/pages.js"></script>
+</body>
+</html>

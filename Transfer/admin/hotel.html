@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arev Transfer</title>
+    <link rel="stylesheet" href="../assets/css/site.css">
+    <link rel="stylesheet" href="../assets/css/panel.css">
+</head>
+<body data-layout="admin" data-root="../" data-page="hotel" data-title="hotels" data-nav="hotels">
+    <main>
+        <a class="link-back" href="hotels.html">← <span data-i18n="hotels"></span></a>
+
+        <form class="card form-card form-narrow" data-demo-form data-demo-message="demoSaved">
+            <h2 id="formTitle"></h2>
+            <div class="form-grid">
+                <div class="field span-2">
+                    <label for="name" data-i18n="name"></label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="field">
+                    <label for="zone" data-i18n="zone"></label>
+                    <select id="zone"></select>
+                </div>
+                <div class="field">
+                    <label for="stars" data-i18n="stars"></label>
+                    <select id="stars"></select>
+                </div>
+                <div class="field span-2">
+                    <label for="address" data-i18n="address"></label>
+                    <input type="text" id="address" required>
+                </div>
+                <div class="field">
+                    <label for="phone" data-i18n="phone"></label>
+                    <input type="tel" id="phone">
+                </div>
+                <div class="field">
+                    <label for="hotelEmail" data-i18n="email"></label>
+                    <input type="email" id="hotelEmail">
+                </div>
+            </div>
+            <label class="checkbox">
+                <input type="checkbox" id="isPartner">
+                <span data-i18n="isPartnerHotel"></span>
+            </label>
+            <div class="form-actions">
+                <a class="btn btn-ghost" href="hotels.html" data-i18n="cancel"></a>
+                <button type="submit" class="btn btn-primary" data-i18n="save"></button>
+            </div>
+        </form>
+    </main>
+
+    <script src="../assets/js/i18n.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script src="../assets/js/pages.js"></script>
+</body>
+</html>

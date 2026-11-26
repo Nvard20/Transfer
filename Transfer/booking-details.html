@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arev Transfer</title>
+    <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-layout="public" data-page="bookingDetails" data-title="myBookingTitle" data-nav="my">
+    <main>
+        <section class="section">
+            <div class="container details-layout">
+                <div>
+                    <a class="link-back" href="my-booking.html">← <span data-i18n="back"></span></a>
+                    <div id="details"></div>
+                </div>
+
+                <aside class="details-side">
+                    <div class="card side-card">
+                        <h3 data-i18n="manageBooking"></h3>
+                        <div class="side-stack" id="manageOpen">
+                            <p class="muted small" data-i18n="manageHint"></p>
+                            <button type="button" class="btn btn-ghost btn-block" data-demo-action data-demo-message="demoChangeRequest" data-i18n="requestChange"></button>
+                            <button type="button" class="btn btn-danger-ghost btn-block" data-demo-action data-demo-confirm="cancelConfirm" data-demo-message="demoCancelled" data-i18n="cancelBooking"></button>
+                        </div>
+                        <p class="muted small" id="manageClosed" data-i18n="manageClosed" hidden></p>
+                        <button type="button" class="btn btn-ghost btn-block" data-print data-i18n="print"></button>
+                    </div>
+
+                    <div class="card side-card">
+                        <h3 data-i18n="needHelp"></h3>
+                        <a href="tel:+37410000000" data-i18n="contactPhoneValue"></a>
+                        <a href="mailto:info@arev-transfer.example" data-i18n="contactEmailValue"></a>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/pages.js"></script>
+</body>
+</html>

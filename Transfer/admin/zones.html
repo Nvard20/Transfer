@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arev Transfer</title>
+    <link rel="stylesheet" href="../assets/css/site.css">
+    <link rel="stylesheet" href="../assets/css/panel.css">
+</head>
+<body data-layout="admin" data-root="../" data-page="zones" data-title="zones" data-nav="zones">
+    <main>
+        <section class="card panel-card">
+            <div class="panel-card-head">
+                <h2 data-i18n="zonesList"></h2>
+                <a class="btn btn-primary btn-sm" href="zone.html">+ <span data-i18n="addZone"></span></a>
+            </div>
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th data-i18n="name"></th>
+                            <th data-i18n="status"></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="zonesBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="../assets/js/i18n.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script src="../assets/js/pages.js"></script>
+</body>
+</html>

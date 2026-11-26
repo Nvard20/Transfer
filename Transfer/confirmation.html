@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arev Transfer</title>
+    <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-layout="public" data-page="confirmation" data-title="bookingReceived" data-nav="book">
+    <main>
+        <section class="section">
+            <div class="container narrow">
+                <div class="card confirm-hero">
+                    <span class="confirm-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="32" height="32"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <h1 data-i18n="bookingReceived"></h1>
+                    <p class="muted" id="confirmLead"></p>
+                    <div class="booking-code">
+                        <span data-i18n="bookingCode"></span>
+                        <strong id="confirmCode"></strong>
+                    </div>
+                </div>
+
+                <div id="details"></div>
+
+                <div class="page-actions">
+                    <a class="btn btn-ghost" href="index.html" data-i18n="backToHome"></a>
+                    <button type="button" class="btn btn-ghost" data-print data-i18n="print"></button>
+                    <a class="btn btn-primary" id="manageLink" href="my-booking.html" data-i18n="manageBooking"></a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/pages.js"></script>
+</body>
+</html>
