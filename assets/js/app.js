@@ -143,13 +143,21 @@
     function renderDetails(b) {
         var arrival = b.direction === "Arrival";
         var tour = b.direction === "Tour";
+        var route = b.direction === "Route";
         var from = arrival ? airportText(b) : place(b);
-        var fromSub = arrival ? b.flightNumber : b.address;
-        var to = tour ? t(Data.tour(b.tourId).nameKey) : (arrival ? place(b) : airportText(b));
-        var toSub = tour ? t("tourHint") : (arrival ? b.address : b.flightNumber);
+        var fromSub = route ? "" : (arrival ? b.flightNumber : b.address);
+        var to = route ? b.toAddress : (tour ? t(Data.tour(b.tourId).nameKey) : (arrival ? place(b) : airportText(b)));
+        var toSub = route ? "" : (tour ? t("tourHint") : (arrival ? b.address : b.flightNumber));
         var row = function (label, value, wide) {
             return '<div class="' + (wide ? "span-2" : "") + '"><dt>' + esc(t(label)) + "</dt><dd>" + esc(value) + "</dd></div>";
         };
+        var mapLink = function (label, href) {
+            return '<div class="span-2"><dt>' + esc(t(label)) + '</dt><dd><a class="link-arrow" target="_blank" rel="noopener" href="' +
+                href + '">' + esc(t("openOnMap")) + " →</a></dd></div>";
+        };
+        var mapRow = route
+            ? mapLink("route", "https://www.openstreetmap.org/directions?route=" + b.lat + "," + b.lng + ";" + b.toLat + "," + b.toLng)
+            : (b.lat && b.lng ? mapLink("pickupPoint", "https://www.openstreetmap.org/?mlat=" + b.lat + "&mlon=" + b.lng + "#map=17/" + b.lat + "/" + b.lng) : "");
 
         return '<div class="card details">' +
             '<div class="details-head"><div><span class="muted small">' + esc(t("bookingCode")) + '</span>' +
@@ -160,9 +168,12 @@
             "</div>" +
             '<dl class="details-grid">' +
             row("direction", t("direction_" + b.direction)) +
-            row(arrival ? "arrivalTime" : "pickupTimeLabel", fmtDateTime(b.pickupTime)) +
-            (tour ? row("tour", t(Data.tour(b.tourId).nameKey)) : row("flightNumber", b.flightNumber || "—")) +
+            row(arrival ? "arrivalTime" : (route ? "routeTime" : "pickupTimeLabel"), fmtDateTime(b.pickupTime)) +
+            (tour ? row("tour", t(Data.tour(b.tourId).nameKey))
+                : route ? row("distance", t("kmValue", b.distanceKm))
+                : row("flightNumber", b.flightNumber || "—")) +
             row("zone", t(Data.zone(b.zoneId).nameKey)) +
+            mapRow +
             row("passengers", b.passengers) +
             (tour ? "" : row("luggage", b.luggage)) +
             row("vehicle", t(Data.vehicle(b.vehicleId).nameKey)) +

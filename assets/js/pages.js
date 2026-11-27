@@ -75,7 +75,9 @@
         }
         var rows = list.map(function (b) {
             var a = Data.airport(b.airportId);
-            var route = b.direction === "Tour"
+            var route = b.direction === "Route"
+                ? App.place(b) + " → " + b.toAddress
+                : b.direction === "Tour"
                 ? App.place(b) + " → " + t(Data.tour(b.tourId).nameKey)
                 : b.direction === "Arrival" ? a.code + " → " + App.place(b) : App.place(b) + " → " + a.code;
             return '<tr data-href="booking.html?id=' + b.code + '">' +
@@ -111,7 +113,79 @@
             el("qAirport").innerHTML = selectOptions(Data.airports, 1, airportName);
             el("qHotel").innerHTML = '<option value="" data-i18n="selectHotel"></option>' +
                 selectOptions(Data.hotels, "", function (h) { return h.name; }) +
-                '<option value="0" data-i18n="otherAddress"></option>';
+                '<option value="0" data-i18n="otherAddress"></option>' +
+                '<option value="map" data-i18n="pickOnMap"></option>';
+
+            // "Pick on map": the point, its zone and address go to booking.html with the form
+            var form = document.querySelector(".quick-form");
+            var picker = MapPicker.attach(el("qMap"), {
+                onPick: function (point) {
+                    form.elements.Lat.value = point.lat.toFixed(6);
+                    form.elements.Lng.value = point.lng.toFixed(6);
+                    form.elements.ZoneId.value = point.zoneId;
+                    form.elements.Address.value = point.address;
+                },
+                onAddress: function (address) {
+                    form.elements.Address.value = address;
+                }
+            });
+            // "Any route" tab: A (from) and B (to) go to booking.html as From*/To* fields
+            var routePicker = MapPicker.attachRoute(el("qRoute"), {
+                onChange: function (r) {
+                    ["from", "to"].forEach(function (name) {
+                        var prefix = name === "from" ? "From" : "To";
+                        var point = r[name];
+                        form.elements[prefix + "Lat"].value = point ? point.lat.toFixed(6) : "";
+                        form.elements[prefix + "Lng"].value = point ? point.lng.toFixed(6) : "";
+                        form.elements[prefix + "Address"].value = point ? point.address : "";
+                    });
+                }
+            });
+
+            // Shows a block and enables its fields, or hides it and disables them (disabled fields are not sent)
+            function toggle(id, show) {
+                var block = el(id);
+                block.hidden = !show;
+                block.querySelectorAll("input, select").forEach(function (f) {
+                    f.disabled = !show;
+                });
+            }
+
+            function direction() {
+                return form.querySelector('input[name="Direction"]:checked').value;
+            }
+
+            function syncQuickForm() {
+                var mode = direction();
+                var route = mode === "Route";
+                var onMap = !route && el("qHotel").value === "map";
+                toggle("qAirportField", mode === "Arrival" || mode === "Departure");
+                toggle("qHotelField", !route);
+                toggle("qTourField", mode === "Tour");
+                toggle("qMapField", onMap);
+                toggle("qRouteField", route);
+                if (onMap) {
+                    picker.show();
+                }
+                if (route) {
+                    routePicker.show();
+                }
+            }
+
+            form.addEventListener("change", function (e) {
+                if (e.target.name === "Direction" || e.target === el("qHotel")) {
+                    syncQuickForm();
+                }
+            });
+            form.addEventListener("submit", function (e) {
+                if (direction() === "Route" && !routePicker.isComplete()) {
+                    e.preventDefault();
+                    routePicker.showError();
+                } else if (direction() !== "Route" && el("qHotel").value === "map" && !picker.hasPoint()) {
+                    e.preventDefault();
+                    picker.showError();
+                }
+            });
             el("qDate").value = App.ymd(new Date(Date.now() + 86400000));
             el("qDate").min = App.ymd(new Date());
             el("qFrom").textContent = t("pricesFrom", App.price(minPrice(function () { return true; })));
@@ -132,17 +206,8 @@
                     '<span class="zone-price">' + esc(t("pricesFrom", App.price(Data.tourPrice(tour.id, 1)))) + "</span></a>";
             }).join("");
 
-            // Quick form: tour needs a tour select instead of the airport
             el("qTour").innerHTML = selectOptions(Data.tours, 1, function (x) { return t(x.nameKey); });
-            document.querySelectorAll('.quick-form input[name="Direction"]').forEach(function (r) {
-                r.addEventListener("change", function () {
-                    var tour = r.value === "Tour";
-                    el("qAirportField").hidden = tour;
-                    el("qAirport").disabled = tour;
-                    el("qTourField").hidden = !tour;
-                    el("qTour").disabled = !tour;
-                });
-            });
+            syncQuickForm();
 
             el("zones").innerHTML = Data.zones.map(function (z) {
                 return '<a class="zone-card" href="booking.html?HotelId=0&ZoneId=' + z.id + '">' +

@@ -6,14 +6,39 @@
         { id: 2, code: "LWN", nameKey: "airport_LWN" }
     ];
 
+    // lat/lng = zone center, radius in km. Used to find the zone of a point picked on the map
     var zones = [
-        { id: 1, nameKey: "zone_YerevanCenter", active: true },
-        { id: 2, nameKey: "zone_YerevanOuter", active: true },
-        { id: 3, nameKey: "zone_Tsaghkadzor", active: true },
-        { id: 4, nameKey: "zone_Sevan", active: true },
-        { id: 5, nameKey: "zone_Dilijan", active: true },
-        { id: 6, nameKey: "zone_Gyumri", active: true }
+        { id: 1, nameKey: "zone_YerevanCenter", active: true, lat: 40.1811, lng: 44.5136, radius: 2.5 },
+        { id: 2, nameKey: "zone_YerevanOuter", active: true, lat: 40.1811, lng: 44.5136, radius: 15 },
+        { id: 3, nameKey: "zone_Tsaghkadzor", active: true, lat: 40.5326, lng: 44.7206, radius: 6 },
+        { id: 4, nameKey: "zone_Sevan", active: true, lat: 40.5560, lng: 45.0030, radius: 25 },
+        { id: 5, nameKey: "zone_Dilijan", active: true, lat: 40.7406, lng: 44.8636, radius: 10 },
+        { id: 6, nameKey: "zone_Gyumri", active: true, lat: 40.7894, lng: 43.8475, radius: 12 }
     ];
+
+    function distanceKm(lat1, lng1, lat2, lng2) {
+        var rad = Math.PI / 180;
+        var dLat = (lat2 - lat1) * rad;
+        var dLng = (lng2 - lng1) * rad;
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    // Smallest zone that contains the point; outside all zones — the closest zone edge
+    function zoneByPoint(lat, lng) {
+        var best = null;
+        var bestScore = Infinity;
+        zones.forEach(function (z) {
+            var d = distanceKm(lat, lng, z.lat, z.lng);
+            var score = d <= z.radius ? z.radius - 1000 : d - z.radius;
+            if (score < bestScore) {
+                best = z;
+                bestScore = score;
+            }
+        });
+        return best;
+    }
 
     var vehicles = [
         { id: 1, nameKey: "vehicle_Sedan", descKey: "vehicle_SedanDesc", icon: "sedan", passengers: 3, luggage: 3, factor: 1, active: true },
@@ -30,6 +55,10 @@
         { id: 5, nameKey: "tour_Dilijan", base: 40000 },
         { id: 6, nameKey: "tour_Tatev", base: 70000 }
     ];
+
+    // Any route A → B: price by distance (AMD) × vehicle factor.
+    // Road distance is estimated as straight line × roadFactor until a routing service is added
+    var routeTariff = { base: 3000, perKm: 250, min: 5000, roadFactor: 1.3 };
 
     function hotel(id, name, zoneId, address, stars, partner) {
         return {
@@ -92,16 +121,43 @@
         return tour && v ? Math.round(tour.base * v.factor / 500) * 500 : 0;
     }
 
+    // a, b = { lat, lng }. Estimated road distance in km, 1 decimal
+    function routeKm(a, b) {
+        var km = distanceKm(Number(a.lat), Number(a.lng), Number(b.lat), Number(b.lng)) * routeTariff.roadFactor;
+        return Math.round(km * 10) / 10;
+    }
+
+    function routePrice(km, vehicleId) {
+        var v = byId(vehicles, vehicleId);
+        if (!v || !km) {
+            return 0;
+        }
+        var amd = Math.max(routeTariff.min, routeTariff.base + km * routeTariff.perKm) * v.factor;
+        return Math.round(amd / 500) * 500;
+    }
+
+    var DIRECTIONS = ["Arrival", "Departure", "Route", "Tour"];
+
     // Builds a booking object from form fields (as in the query string)
     function buildBooking(p, source, code) {
         var airport = byId(airports, p.AirportId) || airports[0];
-        var h = Number(p.HotelId) > 0 ? byId(hotels, p.HotelId) : null;
-        var zone = byId(zones, h ? h.zoneId : (p.ZoneId || 1)) || zones[0];
+        var direction = DIRECTIONS.indexOf(p.Direction) >= 0 ? p.Direction : "Arrival";
+        var route = direction === "Route" && p.FromLat && p.ToLat
+            ? { from: { lat: Number(p.FromLat), lng: Number(p.FromLng) }, to: { lat: Number(p.ToLat), lng: Number(p.ToLng) } }
+            : null;
+        if (direction === "Route" && !route) {
+            direction = "Arrival";
+        }
+        var h = !route && Number(p.HotelId) > 0 ? byId(hotels, p.HotelId) : null;
+        var zone = route ? zoneByPoint(route.from.lat, route.from.lng) : (byId(zones, h ? h.zoneId : (p.ZoneId || 1)) || zones[0]);
         var vehicle = byId(vehicles, p.VehicleTypeId) || vehicles[0];
         var date = p.Date || new Date(Date.now() + 86400000).toISOString().slice(0, 10);
         var time = p.Time || "12:00";
-        var direction = p.Direction === "Departure" || p.Direction === "Tour" ? p.Direction : "Arrival";
         var tour = direction === "Tour" ? (byId(tours, p.TourId) || tours[0]) : null;
+        var km = route ? routeKm(route.from, route.to) : null;
+        var price = tour ? tourPrice(tour.id, vehicle.id)
+            : route ? routePrice(km, vehicle.id)
+            : getPrice(airport.id, zone.id, vehicle.id);
 
         return {
             code: code || "TRF-" + (2000 + Math.floor(Math.random() * 8000)),
@@ -110,14 +166,20 @@
             airportId: airport.id,
             hotelId: h ? h.id : null,
             hotelName: h ? h.name : "",
-            address: h ? h.address : (p.Address || ""),
+            address: h ? h.address : (route ? (p.FromAddress || "") : (p.Address || "")),
+            lat: route ? route.from.lat : (!h && p.Lat ? Number(p.Lat) : null),
+            lng: route ? route.from.lng : (!h && p.Lng ? Number(p.Lng) : null),
+            toAddress: route ? (p.ToAddress || "") : "",
+            toLat: route ? route.to.lat : null,
+            toLng: route ? route.to.lng : null,
+            distanceKm: km,
             zoneId: zone.id,
             pickupTime: new Date(date + "T" + time),
-            flightNumber: tour ? "" : (p.FlightNumber || ""),
+            flightNumber: tour || route ? "" : (p.FlightNumber || ""),
             passengers: Number(p.Passengers) || 1,
             luggage: tour ? 0 : (Number(p.Luggage) || 0),
             vehicleId: vehicle.id,
-            price: tour ? tourPrice(tour.id, vehicle.id) : getPrice(airport.id, zone.id, vehicle.id),
+            price: price,
             customerName: p.CustomerName || "",
             email: p.Email || "",
             phone: p.Phone || "",
@@ -194,11 +256,15 @@
         partnerHotelId: 1,
         airport: function (id) { return byId(airports, id); },
         zone: function (id) { return byId(zones, id); },
+        zoneByPoint: zoneByPoint,
         vehicle: function (id) { return byId(vehicles, id); },
         hotel: function (id) { return byId(hotels, id); },
         tour: function (id) { return byId(tours, id); },
         getPrice: getPrice,
         tourPrice: tourPrice,
+        routeTariff: routeTariff,
+        routeKm: routeKm,
+        routePrice: routePrice,
         buildBooking: buildBooking,
         findBooking: function (code, email) {
             if (!code) {
